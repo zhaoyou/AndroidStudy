@@ -4,6 +4,10 @@
 
 > android:id="@[+][package:]id/resource_name"
 
+#### Re-using Layouts
+> Note: The tools:showIn attribute in the XML above is a special attribute that is removed during compilation and used only at design-time in Android Studio—it specifies a layout that includes this file, so you can preview (and edit) this file as it appears while embedded in a parent layout.
+
+
 #### 线性布局 LinearLayout
 
 #### 相对布局RelativeLayout
