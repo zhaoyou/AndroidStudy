@@ -2,6 +2,8 @@
 
 > ID "@+id/name" 第一次定义一个变量  "@android:id/name" 引用系统android framework的变量
 
+> android:id="@[+][package:]id/resource_name"
+
 #### 线性布局 LinearLayout
 
 #### 相对布局RelativeLayout
