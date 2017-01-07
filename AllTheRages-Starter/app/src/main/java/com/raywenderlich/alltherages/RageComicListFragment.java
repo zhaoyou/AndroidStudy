@@ -22,8 +22,14 @@
 
 package com.raywenderlich.alltherages;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +44,8 @@ public class RageComicListFragment extends Fragment {
   private String[] mDescriptions;
   private String[] mUrls;
 
+  private OnRageComicSelected mListener;
+
   public static RageComicListFragment newInstance() {
     return new RageComicListFragment();
   }
@@ -45,6 +53,46 @@ public class RageComicListFragment extends Fragment {
   public RageComicListFragment() {
     // Required empty public constructor
   }
+
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+
+    if (context instanceof OnRageComicSelected) {
+      mListener = (OnRageComicSelected) context;
+    } else {
+      throw new ClassCastException(context.toString() + " must implement OnRageComicSelected.");
+    }
+
+    // Get rage face names and descriptions.
+    final Resources resources = context.getResources();
+    mNames = resources.getStringArray(R.array.names);
+    mDescriptions = resources.getStringArray(R.array.descriptions);
+    mUrls = resources.getStringArray(R.array.urls);
+
+    // Get rage face images.
+    final TypedArray typedArray = resources.obtainTypedArray(R.array.images);
+    final int imageCount = mNames.length;
+    mImageResIds = new int[imageCount];
+    for (int i = 0; i < imageCount; i++) {
+      mImageResIds[i] = typedArray.getResourceId(i, 0);
+    }
+    typedArray.recycle();
+  }
+
+  @Nullable
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    final View view = inflater.inflate(R.layout.fragment_rage_comic_list, container, false);
+
+    final Activity activity = getActivity();
+    final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+    recyclerView.setLayoutManager(new GridLayoutManager(activity, 2));
+    recyclerView.setAdapter(new RageComicAdapter(activity));
+    return view;
+  }
+
+
 
   class RageComicAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -67,6 +115,13 @@ public class RageComicListFragment extends Fragment {
       final String description = mDescriptions[position];
       final String url = mUrls[position];
       viewHolder.setData(imageResId, name);
+
+      viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          mListener.onRageComicSelected(imageResId, name, description, url);
+        }
+      });
     }
 
     @Override
@@ -93,4 +148,10 @@ public class RageComicListFragment extends Fragment {
       mNameTextView.setText(name);
     }
   }
+
+  public interface OnRageComicSelected {
+    void onRageComicSelected(int imageResId, String name,
+        String description, String url);
+  }
+
 }

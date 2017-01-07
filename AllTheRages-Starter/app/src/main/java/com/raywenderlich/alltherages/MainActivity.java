@@ -24,11 +24,35 @@ package com.raywenderlich.alltherages;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RageComicListFragment.OnRageComicSelected {
+
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    Log.i(MainActivity.class.getName(), "onCreate: init");
+
+    if (savedInstanceState == null) {
+      Log.i(MainActivity.class.getName(), "onCreate: saveInstanceState is null");
+      getSupportFragmentManager().beginTransaction()
+          .add(R.id.root_layout, RageComicListFragment.newInstance(), "comicList")
+          .commit();
+    }
+  }
+
+  @Override
+  public void onRageComicSelected(int imageResId, String name, String description, String url) {
+    final RageComicDetailsFragment detailsFragment =
+        RageComicDetailsFragment.newInstance(imageResId, name, description, url);
+    getSupportFragmentManager()
+        .beginTransaction()
+        .replace(R.id.root_layout, detailsFragment, "rageComicDetails")
+        .addToBackStack(null)
+        .commit();
   }
 }
